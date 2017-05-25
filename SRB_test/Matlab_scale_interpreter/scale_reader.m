@@ -8,8 +8,8 @@ tare=66;
 %% Get the measurements file
     %[FileA,PathA]=uigetfile('*.txt');
     figure(1);
-    FullFileA = '/home/raphael/Documents/P6/kord-rcs/SRB_test/LOG00414.TXT'; %fullfile(PathA,FileA);
-    FullFileB = '/home/raphael/Documents/P6/kord-rcs/SRB_test/LOG00415.TXT';
+    FullFileA = 'C:\Users\raphael\ownCloud\AAU Project\Semester 6\kord-rcs\SRB_test\LOG00414.TXT'; %fullfile(PathA,FileA);
+    FullFileB = 'C:\Users\raphael\ownCloud\AAU Project\Semester 6\kord-rcs\SRB_test\LOG00415.TXT';
     file=dlmread(FullFileA,' ');
     traw=file(:,2);
     fraw=file(:,3);

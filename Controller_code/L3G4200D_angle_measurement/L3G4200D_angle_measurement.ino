@@ -29,43 +29,21 @@ void loop() {
     {
       x = 0;
       y = 0;
-    //  z = 0;
       px = 0;
       py = 0;
-    //  pz = 0;
-    //  t1 = millis();
     }
 
     xini = x * 0.01;
     yini = y * 0.01;
-    //zini = z * 0.01;
     
   //if values are saved
     x = 0.01 * x + px;
     y = 0.01 * y + py;
-    //z = 0.01 * z + pz;
 
   //if not saved
 //  x = x * 0.01;
 //  y = y * 0.01;
   //  z = z * 0.01;
-
-
-  //Big changes  (if values are saved)
-//    if (xini <= px - 1000 || xini >= px + 1000)
-//    {
-//      x = px;
-//    }
-//  
-//    if (yini <= py - 1000 || yini >= py + 1000)
-//    {
-//      y = py;
-//    }
-  
-//    if (zini <= pz - 700 || zini >= pz + 700)
-//    {
-//      z = pz;
-//    }
 
   //Transformation of values into angles
    Anglex = 90 * x ;
@@ -103,28 +81,9 @@ void loop() {
   //Save for next loop
     px = x;
     py = y;
-    //pz = z;
     tempo = 1;
   
 
   delay(10);
-  //   t1 = millis();
-  //   Tsampling = t1 - t;
-  //   Serial.print(Tsampling);
+
 }
-
-
-
-//int callloop(){
-//    int position[4];
-//    loop(&position);
-//}
-//
-//
-//
-//void setup() {
-//  Serial.begin(9600);
-//  Wire.begin();
-//  gyro.enableDefault();
-//  callloop();
-//}
