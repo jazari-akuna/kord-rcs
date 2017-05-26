@@ -12,17 +12,19 @@
 #include <Servo.h>
 #include <Wire.h>
 
-#define STRIM_P 95 // Center point for pitch servo
-#define STRIM_R 70
+#define STRIM_P 95.0 // Center point for pitch servo
+#define STRIM_R 70.0
 
 // Controller
-#define gO 400  
-#define zO 2
-#define pO 1000
+#define gO 2.0  
+#define zO 2.0
+#define pO 300.0
 
-#define g1 1  
-#define z1 50
-#define p1 1100
+#define g1 1.0  
+#define z1 50.0
+#define p1 45.0
+
+#define sampleTime 4.0 // in ms
 
 // Declare the servo objects
 Servo servoP; // Pitch
@@ -31,6 +33,21 @@ Servo servoR; // Roll
 //Declaring some global variables
 int refServoP=STRIM_P;
 int refServoR=STRIM_R;
+
+float previousErrorR1=0;
+float previousErrorP1=0;
+
+float previousErrorR2=0;
+float previousErrorP2=0;
+
+float previousOutputR1=0;
+float previousOutputP1=0;
+
+float previousOutputR2=0;
+float previousOutputP2=0;
+
+double refServoR_1=0;
+double refServoR_2=0;
 
 int gyro_x, gyro_y, gyro_z;
 long gyro_x_cal, gyro_y_cal, gyro_z_cal;
@@ -41,7 +58,8 @@ float angle_roll_acc, angle_pitch_acc;
 
 float angle_pitch, angle_roll;
 int angle_pitch_buffer, angle_roll_buffer;
-float angle_pitch_output, angle_roll_output;
+float angle_roll_output=0;
+float angle_pitch_output=0;
 
 long loop_timer;
 int temp;
@@ -72,7 +90,7 @@ void setup() {
 }
 
 void loop(){
-
+  
   read_mpu_6050_data();   
  //Subtract the offset values from the raw gyro values
   gyro_x -= gyro_x_cal;                                                
@@ -108,11 +126,23 @@ void loop(){
   //To dampen the pitch and roll angles a complementary filter is used
   angle_pitch_output = angle_pitch_output * 0.9 + angle_pitch * 0.1;   //Take 90% of the output pitch value and add 10% of the raw pitch value
   angle_roll_output = angle_roll_output * 0.9 + angle_roll * 0.1;      //Take 90% of the output roll value and add 10% of the raw roll value
-  Serial.print(" | Angle  = "); Serial.println(angle_roll_output);
+  //Serial.print(" | Angle  = "); Serial.println(angle_roll_output);
 
-  refServoR_1 = gO*(2*1000/sampleTime+zO)/(2*1000/sampleTime+pO)*input + gO*(zO-2*1000/sampleTime)/(2*1000/sampleTime+pO)*previousInput - (pO-2*1000/sampleTime)/(2*1000/sampleTime+pO)*previousOutput;
-  refServoR_2 = g1*(2*1000/sampleTime+z1)/(2*1000/sampleTime+p1)*refServoR_1 + g1*(z1-2*1000/sampleTime)/(2*1000/sampleTime+p1)*previousInputR_2 - (p1-2*1000/sampleTime)/(2*1000/sampleTime+p1)*previousOutputR_2;
- while(micros() - loop_timer < 4000);                                 //Wait until the loop_timer reaches 4000us (250Hz) before starting the next loop
+  //refServoR_1 = gO*(2*1000/sampleTime+zO)/(2*1000/sampleTime+pO)*(angle_roll_output) + gO*(zO-2*1000/sampleTime)/(2*1000/sampleTime+pO)*previousErrorR1 - (pO-2*1000/sampleTime)/(2*1000/sampleTime+pO)*previousOutputR1;
+  //refServoR_2 = g1*(2*1000/sampleTime+z1)/(2*1000/sampleTime+p1)*refServoR_1 + g1*(z1-2*1000/sampleTime)/(2*1000/sampleTime+p1)*previousErrorR2 - (p1-2*1000/sampleTime)/(2*1000/sampleTime+p1)*previousOutputR2;
+  
+  previousOutputR1=refServoR_1;
+  previousOutputR2=refServoR_2;
+  
+  previousErrorR1=angle_roll_output-STRIM_R;
+  previousErrorR2=previousOutputR1;
+
+  if(millis()%250 == 0) {
+    Serial.println(refServoR_2);
+    Serial.println(angle_roll_output);
+    Serial.println(" ");
+  }
+ while(micros() - loop_timer < sampleTime*1000); //Wait until the loop_timer reaches 4000us (250Hz) before starting the next loop
   loop_timer = micros();//Reset the loop timer
   
 }
